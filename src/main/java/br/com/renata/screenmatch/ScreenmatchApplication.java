@@ -1,8 +1,6 @@
 package br.com.renata.screenmatch;
 
-import br.com.renata.screenmatch.model.DadosSerie;
-import br.com.renata.screenmatch.service.ConsumoAPI;
-import br.com.renata.screenmatch.service.ConverteDados;
+import br.com.renata.screenmatch.main.Main;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,14 +14,12 @@ public class ScreenmatchApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		ConsumoAPI consumoAPI = new ConsumoAPI();
-		var json = consumoAPI.obterDados("https://www.omdbapi.com/?t=the+office&apikey=b317d573");
 //		System.out.println(json);
-//		json = consumoAPI.obterDados("https://coffee.alexflipnote.dev/random.json");
+//		json = consumoAPI.obterDados("https://coffee.alexflipnote.dev/random.json"); //ele le outros jsons
 //		System.out.println(json);
-		ConverteDados conversor = new ConverteDados();
-		DadosSerie dados = conversor.obterDados(json, DadosSerie.class);
-		System.out.println(dados); //vai printar do jeito que é o toString do record pq o DadosSerie.class é record
+
+		Main main = new Main();
+		main.exibeMenu();
 
 	}
 }
