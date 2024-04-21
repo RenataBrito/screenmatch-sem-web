@@ -6,6 +6,7 @@ import br.com.renata.screenmatch.model.DadosTemporada;
 import br.com.renata.screenmatch.model.Episodio;
 import br.com.renata.screenmatch.service.ConsumoAPI;
 import br.com.renata.screenmatch.service.ConverteDados;
+import ch.qos.logback.core.encoder.JsonEscapeUtil;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -45,24 +46,37 @@ public class Main {
                     .collect(Collectors.toList()); //coleta pra uma lista
             //.toList() -> dados imutavel, nao pode da um add depois
 
-            System.out.println("\nTop 10 eps:");
-            dadosEpisodios.stream()
-                    .filter(e -> !e.avaliacao().equalsIgnoreCase("N/A"))
-                    .peek(e -> System.out.println("Primeiro filtro(N/A) "+ e))
-                    .sorted(Comparator.comparing(DadosEpisodio::avaliacao).reversed())
-                    .peek(e -> System.out.println("Ordenacao "+ e))
-                    .limit(10)
-                    .peek(e -> System.out.println("Limit "+ e))
-                    .map(e -> e.titulo().toUpperCase())
-                    .peek(e -> System.out.println("Map "+ e))
-                    .forEach(System.out::println);
-
+//            System.out.println("\nTop 10 eps:");
+//            dadosEpisodios.stream()
+//                    .filter(e -> !e.avaliacao().equalsIgnoreCase("N/A"))
+//                    .peek(e -> System.out.println("Primeiro filtro(N/A) "+ e))
+//                    .sorted(Comparator.comparing(DadosEpisodio::avaliacao).reversed())
+//                    .peek(e -> System.out.println("Ordenacao "+ e))
+//                    .limit(10)
+//                    .peek(e -> System.out.println("Limit "+ e))
+//                    .map(e -> e.titulo().toUpperCase())
+//                    .peek(e -> System.out.println("Map "+ e))
+//                    .forEach(System.out::println);
+//
             List<Episodio> episodios = temporadas.stream()
                     .flatMap(t -> t.episodios().stream()
                             .map(d -> new Episodio(t.numero(), d))
                     ).collect(Collectors.toList());
 
 //            episodios.forEach(System.out::println);
+
+//            System.out.println("Digite um trecho do titulo do ep: ");
+//            var trechoTitulo = leitura.nextLine();
+//            Optional<Episodio> episodioBuscado = episodios.stream()
+//                    .filter(t -> t.getTitulo().toUpperCase().contains(trechoTitulo.toUpperCase()))
+//                    .findFirst();
+//
+//            if(episodioBuscado.isPresent()){
+//                System.out.println("Episodio encontrado!");
+//                System.out.println("Temporada: " + episodioBuscado.get().getTemporada());
+//            }else{
+//                System.out.println("Episodio nao encontrado.");
+//            }
 //
 //            System.out.println("A partir de que ano quer ve os eps? ");
 //            var ano = leitura.nextInt();
@@ -78,6 +92,19 @@ public class Main {
 //                                    " Episodio: " + e.getTitulo() +
 //                                    " Data lancamento: " + e.getDataLancamento().format(formatador)
 //                    ));
+
+            Map<Integer, Double> avaliacoesPorTemporada = episodios.stream()
+                    .filter(e -> e.getAvaliacao() > 0.0)
+                    .collect(Collectors.groupingBy(Episodio::getTemporada,
+                            Collectors.averagingDouble(Episodio::getAvaliacao)));
+
+            System.out.println(avaliacoesPorTemporada);
+
+            DoubleSummaryStatistics est = episodios.stream()
+                    .filter(e ->e.getAvaliacao() > 0.0)
+                    .collect(Collectors.summarizingDouble(Episodio::getAvaliacao));
+
+            System.out.println(est);
 
         } catch (NullPointerException ex) {
             System.out.println("Problema na chamada do endpoint: " + ex.getMessage());
